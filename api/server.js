@@ -1,5 +1,6 @@
 // BUILD YOUR SERVER HERE
 const express = require("express")
-const app = express();
+const server = express();
+server.use(express.json())
 
-module.exports = app; // EXPORT YOUR SERVER instead of {}
+module.exports = server; // EXPORT YOUR SERVER instead of {}

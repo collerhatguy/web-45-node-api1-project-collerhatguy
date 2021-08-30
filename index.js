@@ -1,5 +1,4 @@
 const server = require('./api/server');
-const { listen, get, post, put } = server;
 
 const {
     find,
@@ -13,7 +12,7 @@ const port = 5000;
 
 // START YOUR SERVER HERE
 
-get("api/users", (req, res) => {
+server.get("/api/users", (req, res) => {
     find().then(users => {
         res.status(200).json(users)
     }).catch(() => {
@@ -21,7 +20,7 @@ get("api/users", (req, res) => {
     })
 })
 
-get("api/users/:id", (req, res) => {
+server.get("/api/users/:id", (req, res) => {
     const { id } = req.params;
     findById(id).then(user => {
         user ? 
@@ -33,9 +32,9 @@ get("api/users/:id", (req, res) => {
     })
 })
 
-post("api/users", (req, res) => {
+server.post("/api/users", (req, res) => {
     const newUser = req.body;
-    if (!newUser.name || !newUser.bio) res.status(400).json('{ message: "Please provide name and bio for the user" }')
+    if (!newUser.name || !newUser.bio) res.status(400).json({ message: "Please provide name and bio for the user" })
     insert(newUser).then(createdUser => {
         res.status(201).json(createdUser)
     })
@@ -44,7 +43,7 @@ post("api/users", (req, res) => {
     })
 })
 
-put("api/users/:id", (req, res) => {
+server.put("/api/users/:id", (req, res) => {
     const { body, params: { id } } = req;
     if (!body.bio || !body.name) res.status(404).json({ message: "The user with the specified ID does not exist" })
     
@@ -58,7 +57,7 @@ put("api/users/:id", (req, res) => {
     })
 })
 
-server.delete("api/users/:id", (req, res) => {
+server.delete("/api/users/:id", (req, res) => {
     remove(req.params.id).then(deletedUser => {
         if (!deletedUser) res.status(404).json({ message: "The user with the specified ID does not exist" })
     }).catch(() => {
@@ -67,6 +66,6 @@ server.delete("api/users/:id", (req, res) => {
 })
 
 
-listen(port, () => {
+server.listen(port, () => {
     console.log("server is running")
 })
