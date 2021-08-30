@@ -14,28 +14,56 @@ const port = 5000;
 // START YOUR SERVER HERE
 
 get("api/users", (req, res) => {
-   res.status(200).json(find())
+    find().then(users => {
+        res.status(200).json(users)
+    }).catch(() => {
+        res.status(500).json({ message: "The users information could not be retrieved" })
+    })
 })
 
 get("api/users/:id", (req, res) => {
-    const user = findById(req.params.id)
-    res.status(200).json(user)
+    const { id } = req.params;
+    findById(id).then(user => {
+        user ? 
+            res.status(200).json(user)
+            :
+            res.status(404).json({ message: "The user with the specified ID does not exist" })
+    }).catch(() => {
+        res.status(500).json({ message: "The user information could not be retrieved" })
+    })
 })
 
 post("api/users", (req, res) => {
-    req.body
-    const newUser = insert(req.body)
-    res.status(200).json(newUser)
+    const newUser = req.body;
+    if (!newUser.name || !newUser.bio) res.status(400).json('{ message: "Please provide name and bio for the user" }')
+    insert(newUser).then(createdUser => {
+        res.status(201).json(createdUser)
+    })
+    .catch(() => {
+        res.status(500).json({ message: "There was an error while saving the user to the database" })
+    })
 })
 
 put("api/users/:id", (req, res) => {
-    const updatedUser = update(req.params.id, res.body)
-    res.status(200).json(updatedUser)
+    const { body, params: { id } } = req;
+    if (!body.bio || !body.name) res.status(404).json({ message: "The user with the specified ID does not exist" })
+    
+    update(id, body).then(updatedUser => {
+        updatedUser ?
+            res.status(200).json(updatedUser)
+            :
+            res.status(404).json({ message: "The user with the specified ID does not exist" })
+    }).catch(() => {
+        res.status(500).json({ message: "The user information could not be modified" })
+    })
 })
 
 server.delete("api/users/:id", (req, res) => {
-    remove(req.params.id)
-    res.status(200).json("deleted")
+    remove(req.params.id).then(deletedUser => {
+        if (!deletedUser) res.status(404).json({ message: "The user with the specified ID does not exist" })
+    }).catch(() => {
+        res.status(500).json({ message: "The user could not be removed" })
+    })
 })
 
 
